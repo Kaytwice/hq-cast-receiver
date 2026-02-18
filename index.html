@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HQ Dungeon Display</title>
+
+    <script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+
+    <style>
+        html, body { margin:0; height:100%; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color:#fff; }
+        body{
+          background:
+            linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.38)),
+            url("./background_party.jpg") center/cover no-repeat;
+        }
+
+        .wrap{ padding: 24px 28px; }
+        .title{ font-size: 34px; font-weight: 650; letter-spacing:.2px; text-shadow:0 2px 6px rgba(0,0,0,.65); }
+        .section{ margin-top: 22px; font-size: 22px; letter-spacing: 3px; text-transform: uppercase; opacity:.95; }
+        .divider{ height:1px; background: rgba(255,255,255,.28); margin: 10px 0 6px; }
+
+        .row{
+          display:flex; align-items:center; gap: 18px;
+          padding: 16px 0;
+          border-bottom: 1px solid rgba(255,255,255,.22);
+        }
+        .pos{ width: 34px; text-align:center; font-size: 18px; font-weight: 750; opacity:.85; }
+        .avatar{
+          width: 68px; height: 68px; border-radius: 50%;
+          border: 2px solid rgba(255,255,255,.35);
+          object-fit: cover; background: rgba(0,0,0,.25);
+          flex: 0 0 auto;
+        }
+        .info{ flex: 1 1 auto; min-width: 0; }
+        .name{ font-size: 28px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; text-shadow:0 2px 6px rgba(0,0,0,.6); }
+        .sub{ margin-top: 6px; font-size: 20px; opacity:.7; }
+        .vals{ display:flex; gap: 34px; align-items:center; justify-content:flex-end; flex: 0 0 auto; }
+        .val{ display:flex; align-items:center; gap: 10px; font-size: 28px; font-weight: 650; color: #ffd84a; text-shadow:0 2px 6px rgba(0,0,0,.55); }
+        .coin{ width: 28px; height: 28px; border-radius:50%; background:#ffd84a; display:inline-block; box-shadow:0 0 0 2px rgba(0,0,0,.25) inset; }
+        .selected{ outline: 2px solid rgba(90,166,255,.95); outline-offset: 6px; border-radius: 12px; }
+
+        .zargon{
+          margin: 16px 0 6px;
+          padding: 16px 18px;
+          background: rgba(20,20,26,.70);
+          border-radius: 12px;
+          font-size: 28px;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          border: 1px solid rgba(255,255,255,.16);
+        }
+
+        .status{ margin-top: 8px; font-size: 14px; opacity:.7; }
+    </style>
+</head>
+
+<body>
+<div class="wrap">
+    <div class="title" id="partyName">Party</div>
+    <div class="status" id="status">Warte auf Verbindung…</div>
+
+    <div class="section">Mitglieder</div>
+    <div class="divider"></div>
+
+    <div id="list"></div>
+</div>
+
+<script src="./receiver.js"></script>
+</body>
+</html>
