@@ -4,6 +4,13 @@ const partyNameEl = document.getElementById('partyName');
 const statusEl = document.getElementById('status');
 const listEl = document.getElementById('list');
 
+statusEl.textContent = 'receiver.js geladen ✅';
+
+// Fehler direkt im UI anzeigen
+window.addEventListener('error', (e) => {
+  statusEl.textContent = 'JS Fehler: ' + (e?.message || 'unknown');
+});
+
 function escapeHtml(s) {
   return String(s)
     .replaceAll('&','&amp;')
@@ -16,22 +23,16 @@ function escapeHtml(s) {
 function avatarSrc(row) {
   if (row.avatarUrl) return row.avatarUrl;
   if (row.avatarBase64) {
-    const b64 = row.avatarBase64.startsWith('data:')
+    return row.avatarBase64.startsWith('data:')
       ? row.avatarBase64
       : `data:image/png;base64,${row.avatarBase64}`;
-    return b64;
   }
   return '';
 }
 
 function applyDensityMode(rows) {
-  // Zähle nur "echte" Helden, Zargon nicht
   const heroCount = rows.filter(r => !(r.type === 'ZARGON' || r.id === 'ZARGON')).length;
-
   document.body.classList.remove('compact', 'ultra');
-
-  // Schwellenwerte kannst du easy anpassen:
-  // <=6 normal, 7-8 compact, >=9 ultra
   if (heroCount >= 9) document.body.classList.add('ultra');
   else if (heroCount >= 7) document.body.classList.add('compact');
 }
@@ -48,7 +49,6 @@ function render(model) {
   let displayIndex = 1;
 
   rows.forEach((r) => {
-    // Zargon Block
     if (r.type === 'ZARGON' || r.id === 'ZARGON') {
       const z = document.createElement('div');
       z.className = 'zargon';
@@ -76,25 +76,43 @@ function render(model) {
         <div class="val"><span class="coin"></span><span>${Number(r.loot || 0)}</span></div>
       </div>
     `;
-
     listEl.appendChild(rowEl);
     displayIndex++;
   });
 }
 
-const ctx = cast.framework.CastReceiverContext.getInstance();
+// ✅ CAF kann manchmal „zu früh“ referenziert werden → wir warten aktiv
+function waitForCastFramework(tries = 60) {
+  if (window.cast && cast.framework && cast.framework.CastReceiverContext) return true;
+  if (tries <= 0) return false;
+  return new Promise((resolve) => setTimeout(resolve, 250)).then(() => waitForCastFramework(tries - 1));
+}
 
-// ✅ Listener VOR start() + JSON.parse falls Android String sendet
-ctx.addCustomMessageListener(NAMESPACE, (event) => {
-  let data = event.data;
+(async () => {
+  statusEl.textContent = 'Warte auf Cast SDK…';
 
-  if (typeof data === 'string') {
-    try { data = JSON.parse(data); } catch (e) { return; }
+  const ok = await waitForCastFramework();
+  if (!ok) {
+    statusEl.textContent = 'Cast SDK nicht geladen ❌';
+    return;
   }
 
-  if (data && data.type === 'DUNGEON_VIEW') {
-    render(data);
-  }
-});
+  statusEl.textContent = 'Cast SDK ok ✅';
 
-ctx.start();
+  const ctx = cast.framework.CastReceiverContext.getInstance();
+
+  ctx.addCustomMessageListener(NAMESPACE, (event) => {
+    let data = event.data;
+
+    if (typeof data === 'string') {
+      try { data = JSON.parse(data); } catch (e) { return; }
+    }
+
+    if (data && data.type === 'DUNGEON_VIEW') {
+      render(data);
+    }
+  });
+
+  ctx.start();
+  statusEl.textContent = 'Receiver gestartet ✅ (warte auf Daten)';
+})();
