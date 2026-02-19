@@ -8,195 +8,179 @@
   <script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
 
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      color: #fff;
-    }
+  :root{
+    /* 🔧 Stellschraube: 0.90..0.98
+       kleiner = mehr Platz, aber kleinerer Text */
+    --ui-scale: 0.92;
 
-    body {
-      background:
-        linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.38)),
-        url("./background_party.jpg") center/cover no-repeat;
-      overflow: hidden;
-    }
+    /* Safe area / Overscan Reserve */
+    --safe-top: 18px;
+    --safe-bottom: 26px;
+    --safe-side: 18px;
+  }
 
-    /* ✅ Vollbild Container */
-    .wrap {
-	    height: 100vh;
-        box-sizing: border-box;
-		padding: clamp(12px, 2.2vw, 24px);
-		display: flex;
-		flex-direction: column;
-		max-width: 760px;   /* 👈 Hochformat-Feeling */
-		margin: 0 auto;     /* 👈 zentriert */
-	}
+  html, body {
+    margin: 0;
+    height: 100%;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color: #fff;
+  }
 
+  body {
+    background:
+      linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.38)),
+      url("./background_party.jpg") center/cover no-repeat;
+    overflow: hidden;
+  }
 
-    .title {
-      font-size: clamp(22px, 3.2vw, 34px);
-      font-weight: 650;
-      letter-spacing: .2px;
-      text-shadow: 0 2px 6px rgba(0,0,0,.65);
-      line-height: 1.1;
-    }
+  /* ✅ Wir rechnen NICHT mehr mit 100vh, sondern ziehen Safe-Area ab */
+  .wrap {
+    height: calc(100vh - var(--safe-top) - var(--safe-bottom));
+    box-sizing: border-box;
+    padding: var(--safe-top) var(--safe-side) var(--safe-bottom);
+    display: flex;
+    flex-direction: column;
 
-    .status {
-      margin-top: 6px;
-      font-size: clamp(12px, 1.4vw, 14px);
-      opacity: .75;
-    }
+    /* ✅ globaler Shrink für ALLES */
+    transform: scale(var(--ui-scale));
+    transform-origin: top left;
 
-    .section {
-      margin-top: clamp(10px, 2.0vw, 18px);
-      font-size: clamp(14px, 2.1vw, 22px);
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      opacity: .95;
-    }
+    /* Damit scaled content nicht rechts/unten abgeschnitten wird */
+    width: calc(100% / var(--ui-scale));
+  }
 
-    .divider {
-      height: 1px;
-      background: rgba(255,255,255,.28);
-      margin: 10px 0 6px;
-      flex: 0 0 auto;
-    }
+  .title {
+    font-size: 34px;
+    font-weight: 650;
+    letter-spacing: .2px;
+    text-shadow: 0 2px 6px rgba(0,0,0,.65);
+    line-height: 1.1;
+  }
 
-    /* ✅ Liste bekommt eigenen Bereich + scroll fallback */
-    #list {
-      flex: 1 1 auto;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      padding-right: 8px;
-    }
+  .status {
+    margin-top: 6px;
+    font-size: 13px;
+    opacity: .75;
+  }
 
-    #list::-webkit-scrollbar { width: 10px; }
-    #list::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,.18);
-      border-radius: 10px;
-    }
+  .section {
+    margin-top: 14px;
+    font-size: 18px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: .95;
+  }
 
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,.18);
-    }
+  .divider {
+    height: 1px;
+    background: rgba(255,255,255,.26);
+    margin: 8px 0 6px;
+    flex: 0 0 auto;
+  }
 
-    .pos {
-      width: clamp(24px, 2.2vw, 34px);
-      text-align: center;
-      font-size: clamp(14px, 1.8vw, 18px);
-      font-weight: 750;
-      opacity: .85;
-      flex: 0 0 auto;
-    }
+  /* ✅ Keine Scrollbars, weil du nicht scrollen willst */
+  #list {
+    flex: 1 1 auto;
+    overflow: hidden;
+    padding-right: 0;
+  }
 
-    .avatar {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.3);
-      object-fit: cover;
-      background: rgba(0,0,0,.25);
-      flex: 0 0 auto;
-    }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,.18);
+  }
 
-    .info {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
+  .pos {
+    width: 28px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 750;
+    opacity: .85;
+    flex: 0 0 auto;
+  }
 
-    .name {
-      font-size: clamp(18px, 2.6vw, 28px);
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-shadow: 0 2px 6px rgba(0,0,0,.6);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  .avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.32);
+    object-fit: cover;
+    background: rgba(0,0,0,.25);
+    flex: 0 0 auto;
+  }
 
-    .sub {
-      margin-top: 6px;
-      font-size: clamp(14px, 2.0vw, 20px);
-      opacity: .7;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  .info {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
 
-    .vals {
-      display: flex;
-      gap: clamp(18px, 2.6vw, 34px);
-      align-items: center;
-      justify-content: flex-end;
-      flex: 0 0 auto;
-    }
+  .name {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 6px rgba(0,0,0,.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    .val {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: clamp(18px, 2.6vw, 28px);
-      font-weight: 650;
-      color: #ffd84a;
-      text-shadow: 0 2px 6px rgba(0,0,0,.55);
-    }
+  .sub {
+    margin-top: 3px;
+    font-size: 16px;
+    opacity: .7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    .coin {
-      width: clamp(18px, 2.4vw, 28px);
-      height: clamp(18px, 2.4vw, 28px);
-      border-radius: 50%;
-      background: #ffd84a;
-      display: inline-block;
-      box-shadow: 0 0 0 2px rgba(0,0,0,.25) inset;
-      flex: 0 0 auto;
-    }
+  .vals {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+  }
 
-    .selected {
-      outline: 2px solid rgba(90,166,255,.95);
-      outline-offset: 6px;
-      border-radius: 12px;
-    }
+  .val {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 22px;
+    font-weight: 650;
+    color: #ffd84a;
+    text-shadow: 0 2px 6px rgba(0,0,0,.55);
+  }
 
-    .zargon {
-      margin: 12px 0 6px;
-      padding: clamp(10px, 1.6vw, 16px) clamp(12px, 1.8vw, 18px);
-      background: rgba(20,20,26,.70);
-      border-radius: 12px;
-      font-size: clamp(18px, 2.6vw, 28px);
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      border: 1px solid rgba(255,255,255,.16);
-    }
+  .coin {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffd84a;
+    display: inline-block;
+    box-shadow: 0 0 0 2px rgba(0,0,0,.22) inset;
+    flex: 0 0 auto;
+  }
 
-    /* =========================================================
-       ✅ Auto-Compact Mode (vom receiver.js gesetzt)
-       ========================================================= */
+  .selected {
+    outline: 2px solid rgba(90,166,255,.95);
+    outline-offset: 5px;
+    border-radius: 12px;
+  }
 
-    body.compact .row { padding: 8px 0; }
-    body.compact .avatar { width: 48px; height: 48px; }
-    body.compact .name { font-size: 20px; }
-    body.compact .sub { font-size: 14px; margin-top: 3px; }
-    body.compact .val { font-size: 20px; }
-    body.compact .coin { width: 16px; height: 16px; }
-    body.compact .zargon { padding: 10px 12px; font-size: 22px; margin: 10px 0 6px; }
-    body.compact .title { font-size: 30px; }
-    body.compact .section { font-size: 18px; }
-
-    body.ultra .row { padding: 7px 0; }
-    body.ultra .avatar { width: 44px; height: 44px; }
-    body.ultra .name { font-size: 18px; }
-    body.ultra .sub { font-size: 14px; margin-top: 3px; }
-    body.ultra .val { font-size: 18px; }
-    body.ultra .coin { width: 18px; height: 18px; }
-    body.ultra .zargon { padding: 8px 10px; font-size: 18px; margin: 8px 0 6px; }
-    body.ultra .title { font-size: 26px; }
-    body.ultra .section { font-size: 16px; }
+  .zargon {
+    margin: 10px 0 6px;
+    padding: 10px 14px;
+    background: rgba(20,20,26,.70);
+    border-radius: 12px;
+    font-size: 22px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: 1px solid rgba(255,255,255,.16);
+  }
   </style>
 </head>
 
