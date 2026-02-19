@@ -24,12 +24,15 @@
 
     /* ✅ Vollbild Container */
     .wrap {
-      height: 100vh;
-      box-sizing: border-box;
-      padding: clamp(12px, 2.2vw, 24px) clamp(14px, 2.6vw, 28px);
-      display: flex;
-      flex-direction: column;
-    }
+	    height: 100vh;
+        box-sizing: border-box;
+		padding: clamp(12px, 2.2vw, 24px);
+		display: flex;
+		flex-direction: column;
+		max-width: 760px;   /* 👈 Hochformat-Feeling */
+		margin: 0 auto;     /* 👈 zentriert */
+	}
+
 
     .title {
       font-size: clamp(22px, 3.2vw, 34px);
