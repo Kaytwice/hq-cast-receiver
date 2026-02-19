@@ -24,13 +24,31 @@ function avatarSrc(row) {
   return '';
 }
 
+function applyDensityMode(rows) {
+  // Zähle nur "echte" Helden, Zargon nicht
+  const heroCount = rows.filter(r => !(r.type === 'ZARGON' || r.id === 'ZARGON')).length;
+
+  document.body.classList.remove('compact', 'ultra');
+
+  // Schwellenwerte kannst du easy anpassen:
+  // <=6 normal, 7-8 compact, >=9 ultra
+  if (heroCount >= 9) document.body.classList.add('ultra');
+  else if (heroCount >= 7) document.body.classList.add('compact');
+}
+
 function render(model) {
   partyNameEl.textContent = model.partyName || 'Party';
   statusEl.textContent = 'Verbunden ✅';
+
   listEl.innerHTML = '';
 
   const rows = Array.isArray(model.rows) ? model.rows : [];
-  rows.forEach((r, idx) => {
+  applyDensityMode(rows);
+
+  let displayIndex = 1;
+
+  rows.forEach((r) => {
+    // Zargon Block
     if (r.type === 'ZARGON' || r.id === 'ZARGON') {
       const z = document.createElement('div');
       z.className = 'zargon';
@@ -47,7 +65,7 @@ function render(model) {
     const sub = escapeHtml(r.subtitle ?? '');
 
     rowEl.innerHTML = `
-      <div class="pos">${idx + 1}</div>
+      <div class="pos">${displayIndex}</div>
       <img class="avatar" ${src ? `src="${src}"` : ''} />
       <div class="info">
         <div class="name">${name}</div>
@@ -60,16 +78,16 @@ function render(model) {
     `;
 
     listEl.appendChild(rowEl);
+    displayIndex++;
   });
 }
 
 const ctx = cast.framework.CastReceiverContext.getInstance();
 
-// ✅ Listener VOR start()
+// ✅ Listener VOR start() + JSON.parse falls Android String sendet
 ctx.addCustomMessageListener(NAMESPACE, (event) => {
   let data = event.data;
 
-  // ✅ Android sendet String -> wir parsen
   if (typeof data === 'string') {
     try { data = JSON.parse(data); } catch (e) { return; }
   }
