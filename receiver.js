@@ -14,25 +14,23 @@ function escapeHtml(s) {
 }
 
 function avatarSrc(row) {
-  // Prefer URL, fallback to base64
   if (row.avatarUrl) return row.avatarUrl;
   if (row.avatarBase64) {
-    // allow sending raw base64 without prefix
-    const b64 = row.avatarBase64.startsWith('data:') ? row.avatarBase64 : `data:image/png;base64,${row.avatarBase64}`;
+    const b64 = row.avatarBase64.startsWith('data:')
+      ? row.avatarBase64
+      : `data:image/png;base64,${row.avatarBase64}`;
     return b64;
   }
-  return ''; // empty -> shows background
+  return '';
 }
 
 function render(model) {
   partyNameEl.textContent = model.partyName || 'Party';
   statusEl.textContent = 'Verbunden ✅';
-
   listEl.innerHTML = '';
 
   const rows = Array.isArray(model.rows) ? model.rows : [];
   rows.forEach((r, idx) => {
-    // optional: show Zargon block if your sender includes it as a special row
     if (r.type === 'ZARGON' || r.id === 'ZARGON') {
       const z = document.createElement('div');
       z.className = 'zargon';
@@ -66,11 +64,19 @@ function render(model) {
 }
 
 const ctx = cast.framework.CastReceiverContext.getInstance();
-ctx.start();
 
+// ✅ Listener VOR start()
 ctx.addCustomMessageListener(NAMESPACE, (event) => {
-  const data = event.data;
+  let data = event.data;
+
+  // ✅ Android sendet String -> wir parsen
+  if (typeof data === 'string') {
+    try { data = JSON.parse(data); } catch (e) { return; }
+  }
+
   if (data && data.type === 'DUNGEON_VIEW') {
     render(data);
   }
 });
+
+ctx.start();
