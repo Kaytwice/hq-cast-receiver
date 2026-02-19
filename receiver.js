@@ -33,7 +33,7 @@ function avatarSrc(row) {
 function applyDensityMode(rows) {
   const heroCount = rows.filter(r => !(r.type === 'ZARGON' || r.id === 'ZARGON')).length;
   document.body.classList.remove('compact', 'ultra');
-  if (heroCount >= 9) document.body.classList.add('ultra');
+  if (heroCount >= 8) document.body.classList.add('ultra');
   else if (heroCount >= 7) document.body.classList.add('compact');
 }
 

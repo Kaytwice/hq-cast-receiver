@@ -8,179 +8,199 @@
   <script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
 
   <style>
-  :root{
-    /* 🔧 Stellschraube: 0.90..0.98
-       kleiner = mehr Platz, aber kleinerer Text */
-    --ui-scale: 0.92;
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #fff;
+    }
 
-    /* Safe area / Overscan Reserve */
-    --safe-top: 18px;
-    --safe-bottom: 26px;
-    --safe-side: 18px;
-  }
+    body {
+      background:
+        linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.38)),
+        url("./background_party.jpg") center/cover no-repeat;
+      overflow: hidden;
+    }
 
-  html, body {
-    margin: 0;
-    height: 100%;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    color: #fff;
-  }
+    /* ✅ Safe area + "Hochformat-Panel" */
+    .wrap {
+      height: calc(100vh - 56px); /* mehr Reserve gegen Overscan */
+      box-sizing: border-box;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
 
-  body {
-    background:
-      linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.38)),
-      url("./background_party.jpg") center/cover no-repeat;
-    overflow: hidden;
-  }
+      max-width: 700px;
+      margin: 0 auto;
+    }
 
-  /* ✅ Wir rechnen NICHT mehr mit 100vh, sondern ziehen Safe-Area ab */
-  .wrap {
-    height: calc(100vh - var(--safe-top) - var(--safe-bottom));
-    box-sizing: border-box;
-    padding: var(--safe-top) var(--safe-side) var(--safe-bottom);
-    display: flex;
-    flex-direction: column;
+    .title {
+      font-size: 26px;
+      font-weight: 650;
+      letter-spacing: .2px;
+      text-shadow: 0 2px 6px rgba(0,0,0,.65);
+      line-height: 1.1;
+    }
 
-    /* ✅ globaler Shrink für ALLES */
-    transform: scale(var(--ui-scale));
-    transform-origin: top left;
+    .status {
+      margin-top: 4px;
+      font-size: 12px;
+      opacity: .75;
+    }
 
-    /* Damit scaled content nicht rechts/unten abgeschnitten wird */
-    width: calc(100% / var(--ui-scale));
-  }
+    .section {
+      margin-top: 10px;
+      font-size: 15px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: .95;
+    }
 
-  .title {
-    font-size: 34px;
-    font-weight: 650;
-    letter-spacing: .2px;
-    text-shadow: 0 2px 6px rgba(0,0,0,.65);
-    line-height: 1.1;
-  }
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,.22);
+      margin: 8px 0 6px;
+      flex: 0 0 auto;
+    }
 
-  .status {
-    margin-top: 6px;
-    font-size: 13px;
-    opacity: .75;
-  }
+    /* ✅ Kein Scroll (TV/Beamer) */
+    #list {
+      flex: 1 1 auto;
+      overflow: hidden;
+      padding-right: 0;
+    }
+    #list::-webkit-scrollbar { display: none; }
 
-  .section {
-    margin-top: 14px;
-    font-size: 18px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    opacity: .95;
-  }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,.16);
+    }
 
-  .divider {
-    height: 1px;
-    background: rgba(255,255,255,.26);
-    margin: 8px 0 6px;
-    flex: 0 0 auto;
-  }
+    .pos {
+      width: 24px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 750;
+      opacity: .85;
+      flex: 0 0 auto;
+    }
 
-  /* ✅ Keine Scrollbars, weil du nicht scrollen willst */
-  #list {
-    flex: 1 1 auto;
-    overflow: hidden;
-    padding-right: 0;
-  }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.28);
+      object-fit: cover;
+      background: rgba(0,0,0,.25);
+      flex: 0 0 auto;
+    }
 
-  .row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 9px 0;
-    border-bottom: 1px solid rgba(255,255,255,.18);
-  }
+    .info {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
 
-  .pos {
-    width: 28px;
-    text-align: center;
-    font-size: 15px;
-    font-weight: 750;
-    opacity: .85;
-    flex: 0 0 auto;
-  }
+    .name {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      text-shadow: 0 2px 6px rgba(0,0,0,.6);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  .avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,.32);
-    object-fit: cover;
-    background: rgba(0,0,0,.25);
-    flex: 0 0 auto;
-  }
+    .sub {
+      margin-top: 2px;
+      font-size: 13px;
+      opacity: .7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  .info {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
+    .vals {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 0 0 auto;
+    }
 
-  .name {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
-    text-shadow: 0 2px 6px rgba(0,0,0,.6);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    .val {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 18px;
+      font-weight: 650;
+      color: #ffd84a;
+      text-shadow: 0 2px 6px rgba(0,0,0,.55);
+    }
 
-  .sub {
-    margin-top: 3px;
-    font-size: 16px;
-    opacity: .7;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+    .coin {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffd84a;
+      display: inline-block;
+      box-shadow: 0 0 0 2px rgba(0,0,0,.20) inset;
+      flex: 0 0 auto;
+    }
 
-  .vals {
-    display: flex;
-    gap: 22px;
-    align-items: center;
-    justify-content: flex-end;
-    flex: 0 0 auto;
-  }
+    .selected {
+      outline: 2px solid rgba(90,166,255,.95);
+      outline-offset: 4px;
+      border-radius: 10px;
+    }
 
-  .val {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 22px;
-    font-weight: 650;
-    color: #ffd84a;
-    text-shadow: 0 2px 6px rgba(0,0,0,.55);
-  }
+    .zargon {
+      margin: 8px 0 4px;
+      padding: 8px 12px;
+      background: rgba(20,20,26,.70);
+      border-radius: 10px;
+      font-size: 18px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,.14);
+    }
 
-  .coin {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #ffd84a;
-    display: inline-block;
-    box-shadow: 0 0 0 2px rgba(0,0,0,.22) inset;
-    flex: 0 0 auto;
-  }
+    /* =========================================================
+       ✅ Auto-Compact Mode (vom receiver.js gesetzt)
+       Ziel: ab 7/8 Helden nochmal dichter
+       ========================================================= */
 
-  .selected {
-    outline: 2px solid rgba(90,166,255,.95);
-    outline-offset: 5px;
-    border-radius: 12px;
-  }
+    /* compact: ein bisschen kleiner */
+    body.compact .row { padding: 5px 0; gap: 10px; }
+    body.compact .avatar { width: 36px; height: 36px; }
+    body.compact .pos { width: 22px; font-size: 12px; }
+    body.compact .name { font-size: 16px; letter-spacing: 1.2px; }
+    body.compact .sub { font-size: 12px; margin-top: 2px; }
+    body.compact .vals { gap: 14px; }
+    body.compact .val { font-size: 16px; gap: 6px; }
+    body.compact .coin { width: 12px; height: 12px; }
+    body.compact .zargon { font-size: 16px; padding: 7px 10px; margin: 7px 0 4px; }
+    body.compact .title { font-size: 24px; }
+    body.compact .section { font-size: 14px; }
+    body.compact .divider { margin: 7px 0 5px; }
 
-  .zargon {
-    margin: 10px 0 6px;
-    padding: 10px 14px;
-    background: rgba(20,20,26,.70);
-    border-radius: 12px;
-    font-size: 22px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    border: 1px solid rgba(255,255,255,.16);
-  }
+    /* ultra: für "8 Helden" maximal dicht */
+    body.ultra .row { padding: 4px 0; gap: 9px; }
+    body.ultra .avatar { width: 32px; height: 32px; }
+    body.ultra .pos { width: 20px; font-size: 11px; }
+    body.ultra .name { font-size: 15px; letter-spacing: 1.0px; }
+    body.ultra .sub { font-size: 11px; margin-top: 1px; }
+    body.ultra .vals { gap: 12px; }
+    body.ultra .val { font-size: 15px; gap: 6px; }
+    body.ultra .coin { width: 11px; height: 11px; }
+    body.ultra .zargon { font-size: 15px; padding: 6px 10px; margin: 6px 0 3px; }
+    body.ultra .title { font-size: 22px; }
+    body.ultra .section { font-size: 13px; }
+    body.ultra .divider { margin: 6px 0 4px; }
+    body.ultra .status { font-size: 11px; }
   </style>
 </head>
 
@@ -195,6 +215,6 @@
     <div id="list"></div>
   </div>
 
-  <script src="./receiver.js"></script>
+  <script src="./receiver.js?v=21"></script>
 </body>
 </html>
