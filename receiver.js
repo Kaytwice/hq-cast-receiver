@@ -113,6 +113,6 @@ function waitForCastFramework(tries = 60) {
     }
   });
 
-  ctx.start();
+  ctx.start({ disableIdleTimeout: true });
   statusEl.textContent = 'Receiver gestartet ✅ (warte auf Daten)';
 })();
