@@ -20,6 +20,17 @@ function escapeHtml(s) {
     .replaceAll("'","&#039;");
 }
 
+// Noch nicht verbuchte Änderung: Beute mit „+“, Abzug durch die Spielleitung mit „-“ und in Rot.
+function formatLoot(value) {
+  const n = Number(value || 0);
+  return n > 0 ? `+${n}` : String(n);
+}
+
+function lootClass(value) {
+  const n = Number(value || 0);
+  return n < 0 ? 'loss' : '';
+}
+
 function avatarSrc(row) {
   if (row.avatarUrl) return row.avatarUrl;
   if (row.avatarBase64) {
@@ -73,7 +84,7 @@ function render(model) {
       </div>
       <div class="vals">
         <div class="val"><span class="coin"></span><span>${Number(r.gold || 0)}</span></div>
-        <div class="val"><span class="coin"></span><span>${Number(r.loot || 0)}</span></div>
+        <div class="val ${lootClass(r.loot)}"><span class="coin"></span><span>${formatLoot(r.loot)}</span></div>
       </div>
     `;
     listEl.appendChild(rowEl);
